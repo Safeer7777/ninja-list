@@ -10,8 +10,9 @@ type Ninja = {
 };
 
 // This function generates dynamic metadata for each ninja page
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const ninja = await getSingleNinja(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const ninja = await getSingleNinja(id);
   if (!ninja) {
     return {
       title: 'Ninja Not Found',
@@ -31,13 +32,14 @@ async function getSingleNinja(id: string): Promise<Ninja | null> {
       return null;
     }
     return res.json();
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
-export default async function NinjaDetails({ params }: { params: { id: string } }) {
-  const ninja = await getSingleNinja(params.id);
+export default async function NinjaDetails({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const ninja = await getSingleNinja(id);
 
   // If no ninja is found, show the 404 page
   if (!ninja) {
